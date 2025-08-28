@@ -5,8 +5,10 @@ import androidx.navigation.*
 import androidx.navigation.compose.*
 
 @Composable
-fun WhatsAppNavGraph(navController : NavHostController){
-    NavHost(navController = navController, startDestination = "home") {
+fun WhatsAppNavGraph(navController : NavHostController, authViewModel : AuthViewModel){
+    NavHost(navController = navController, startDestination = "splash") {
+        composable("splash"){ SplashScreen(navController, authViewModel) }
+        composable("login") { LoginScreen(navController, authViewModel) }
         composable("home") { HomeScreen(navController) }
 
         composable("chat/{chatId}", arguments = listOf(navArgument("chatId") {type = NavType.StringType })
