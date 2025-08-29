@@ -6,16 +6,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 
 @Composable
-fun WhatsAppTabRow(selectedTab: Int) {
+fun WhatsAppTabRow(
+    selectedTab: Int,
+    onTabSelected: (Int) -> Unit
+) {
+    val labels = listOf("Chats", "Status", "Calls")
     TabRow(selectedTabIndex = selectedTab) {
-        Tab(selected = selectedTab == 0, onClick = { /*TODO*/}){
-            Text("Chats")
-        }
-        Tab(selected = selectedTab == 1, onClick = { /*TODO*/}){
-            Text("Status")
-        }
-        Tab(selected = selectedTab == 2, onClick = { /*TODO*/}){
-            Text("Calls")
+        labels.forEachIndexed { index, label ->
+            Tab(
+                selected = selectedTab == index,
+                onClick = { onTabSelected(index) }
+            ) {
+                Text(label)
+            }
         }
     }
 }
