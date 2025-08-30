@@ -22,17 +22,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 
-data class ChatData(val id: String, val name : String, val lastMessage : String, val time : String)
+data class ChatData(
+    val id: String,
+    val receiverId: String,
+    val name : String,
+    val lastMessage : String,
+    val time : String
+)
 
 @Composable
-fun ChatListScreen(onChatClicked: (String) -> Unit){
+fun ChatListScreen(onChatClicked: (String, String) -> Unit){
     val sampleChats = listOf(
-        ChatData("1", "Alice", "Hey there!", "10:00 AM"),
-        ChatData("2", "BOB", "what's up?", "11:30 AM")
+        ChatData("1", "Alice_uid","Alice", "Hey there!", "10:00 AM"),
+        ChatData("2", "BOB_uid","BOB", "what's up?", "11:30 AM")
     )
     LazyColumn {
         items(sampleChats) { chat ->
-            ChatListItem(chat = chat, onClick = { onChatClicked(chat.id) })
+            ChatListItem(chat = chat, onClick = { onChatClicked(chat.id, chat.receiverId) })
             Divider()
         }
     }

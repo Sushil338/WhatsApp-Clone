@@ -22,8 +22,8 @@ fun HomeScreen(navController: NavController) {
         Column(modifier = Modifier.padding(paddingValues)) {
             WhatsAppTabRow(selectedTab = selectedTab, onTabSelected = { selectedTab = it })
             when (selectedTab) {
-                0 -> ChatListScreen(onChatClicked = { chatId ->
-                    navController.navigate("chat/$chatId")
+                0 -> ChatListScreen(onChatClicked = { chatId , receiverId ->
+                    navController.navigate("chat/$chatId/$receiverId")
                 })
 //                1 -> StatusListScreen(navController)
 //                2 -> CallsListScreen(navController)

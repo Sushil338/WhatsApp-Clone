@@ -21,17 +21,22 @@ fun WhatsAppNavGraph(
         composable("home") {
             HomeScreen(navController)
         }
-        composable(
-            "chat/{chatId}",
-            arguments = listOf(navArgument("chatId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val chatId = backStackEntry.arguments?.getString("chatId") ?: ""
-            ChatScreen(chatId)
-        }
         composable("profile") { backStackEntry ->
             val profileViewModel: ProfileViewModel = viewModel()
             val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
             UserProfileSetupScreen(navController, profileViewModel, userId)
         }
+        composable(
+            "chat/{chatId}/{receiverId}",
+            arguments = listOf(
+                navArgument("chatId") { type = NavType.StringType },
+                navArgument("receiverId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val chatId = backStackEntry.arguments?.getString("chatId") ?: ""
+            val receiverId = backStackEntry.arguments?.getString("receiverId") ?: ""
+            ChatScreen(chatId = chatId, receiverId = receiverId)
+        }
+
     }
 }
