@@ -13,7 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,7 +39,7 @@ fun ChatListScreen(onChatClicked: (String, String) -> Unit){
     LazyColumn {
         items(sampleChats) { chat ->
             ChatListItem(chat = chat, onClick = { onChatClicked(chat.id, chat.receiverId) })
-            Divider()
+            HorizontalDivider()
         }
     }
 }

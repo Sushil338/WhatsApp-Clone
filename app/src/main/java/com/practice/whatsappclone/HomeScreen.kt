@@ -1,5 +1,7 @@
 package com.practice.whatsappclone
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -11,6 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(navController: NavController) {
     var selectedTab by remember { mutableStateOf(0) }
@@ -25,7 +28,7 @@ fun HomeScreen(navController: NavController) {
                 0 -> ChatListScreen(onChatClicked = { chatId , receiverId ->
                     navController.navigate("chat/$chatId/$receiverId")
                 })
-//                1 -> StatusListScreen(navController)
+                1 -> StatusListScreen(navController)
 //                2 -> CallsListScreen(navController)
             }
         }
