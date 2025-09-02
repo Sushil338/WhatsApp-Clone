@@ -8,18 +8,20 @@ import androidx.lifecycle.ViewModel
 
 class ProfileViewModel(
     private val userRepo: UserRepository = UserRepository()
-) : ViewModel(){
+) : ViewModel() {
     var name by mutableStateOf("")
+    var about by mutableStateOf("")
+    var bio by mutableStateOf("")
     var photoUri by mutableStateOf<Uri?>(null)
     var isLoading by mutableStateOf(false)
     var error by mutableStateOf<String?>(null)
 
-    fun saveUserProfile(userId: String, onProfileSaved:() -> Unit) {
+    fun saveUserProfile(userId: String, onProfileSaved: () -> Unit) {
         isLoading = true
-        userRepo.saveProfile(userId, name, photoUri){success, msg ->
+        userRepo.saveProfile(userId, name, about, bio, photoUri) { success, msg ->
             isLoading = false
             error = msg
-            if(success) onProfileSaved()
+            if (success) onProfileSaved()
         }
     }
 }

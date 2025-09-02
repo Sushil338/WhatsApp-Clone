@@ -10,7 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 
 @Composable
 fun CreateStatusScreen(
@@ -35,7 +35,7 @@ fun CreateStatusScreen(
         }
         imageUri?.let {
             Image(
-                painter = rememberImagePainter(it),
+                painter = rememberAsyncImagePainter(it),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()

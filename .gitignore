@@ -1,17 +1,43 @@
+# ========================
+# Android / App
+# ========================
 *.iml
 .gradle
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
+/.idea/
+/.DS_Store
 /build
 /captures
 .externalNativeBuild
 .cxx
-local.properties
-# Firebase/Google config
-**/google-services.json
+
+# Firebase / Google config (sensitive)
+**/google-services.json 
+**/serviceAccountKey.json
+
+# Firebase Functions
+functions/node_modules/
+functions/.env
+functions/*.log
+
+# Vercel / VercelNotifications
+VercelNotifications/node_modules/
+VercelNotifications/.vercel/
+VercelNotifications/.env
+VercelNotifications/*.log
+
+# Node (general)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+pnpm-lock.yaml
+.env
+
+# Optional / OS files
+*.log
+*.tmp
+*.swp
+Thumbs.db
+.vercel

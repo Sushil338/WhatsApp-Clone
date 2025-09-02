@@ -1,24 +1,83 @@
 package com.practice.whatsappclone
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WhatsAppAppBar(){
+fun WhatsAppAppBar(navController: NavController){
+
+    var expanded by remember { mutableStateOf(false) }
+
+
     TopAppBar(
         title = {Text("WhatsApp Clone")},
         actions = {
             IconButton(onClick = {}) { Icon(Icons.Default.Search, contentDescription = "Search") }
-            IconButton(onClick = {}) { Icon(Icons.Default.MoreVert, contentDescription = "Search") }
+
+            IconButton(onClick = { expanded = true }) {
+                Icon(Icons.Default.MoreVert, contentDescription = "More options")
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text("Settings") },
+                    onClick = {
+                        expanded = false
+                        navController.navigate("settings")
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text("Profile") },
+                    onClick = {
+                        expanded = false
+                        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+                        navController.navigate("profile/$userId")
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text("Logout") },
+                    onClick = {
+                        expanded = false
+                        // Firebase sign out
+                        FirebaseAuth.getInstance().signOut()
+
+                        // clear any app cached data or ViewModel states here if needed
+
+                        // Navigate to login clearing backstack
+                        navController.navigate("login") {
+                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                        }
+                    }
+                )
+                // Add more menu items if needed
+            }
+
+            IconButton(onClick = {
+                val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+                navController.navigate("profile/$userId")
+            }) {
+                Icon(Icons.Default.AccountCircle, contentDescription = "Profile")
+            }
         }
     )
 }

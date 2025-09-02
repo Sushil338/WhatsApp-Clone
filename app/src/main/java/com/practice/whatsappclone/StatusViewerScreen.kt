@@ -11,7 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+
 
 @Composable
 fun StatusViewerScreen(
@@ -28,7 +29,7 @@ fun StatusViewerScreen(
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         status?.let {
             Image(
-                painter = rememberImagePainter(it.imageUrl),
+                painter = rememberAsyncImagePainter(it.imageUrl),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize()
             )

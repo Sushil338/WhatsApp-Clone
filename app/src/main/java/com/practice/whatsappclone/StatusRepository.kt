@@ -14,13 +14,13 @@ class StatusRepository (
         userId: String,
         userName : String,
         userProfileUrl : String,
-        imageuri : Uri,
+        imageUri : Uri,
         onComplete: (Boolean, String?) -> Unit
     ){
         val statusId = db.collection("statuses").document().id
         val storageRef = storage.reference.child("statuses/${UUID.randomUUID()}.jpg")
 
-        storageRef.putFile(imageuri).continueWithTask { task ->
+        storageRef.putFile(imageUri).continueWithTask { task ->
             if(!task.isSuccessful) throw task.exception ?: Exception("Image Upload failed!!")
             storageRef.downloadUrl
         }.addOnSuccessListener {downloadUri ->
