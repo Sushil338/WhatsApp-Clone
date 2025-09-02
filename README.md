@@ -5,4 +5,8 @@ Add More Functionalities like(LoginScreen, Authentication process using AuthRepo
 
 Added (Message Bubble, Chat message Model, Messaging Logic)
 
-Added status related files. (Status Data file, StatusListScreen, Status Repository, StatusViewScreen)
+Added status related files. (Status Data file, StatusListScreen, Status Repository, StatusViewScreen, createStatus)
+
+Added ( CallList Screen, Call Screen, Setting Screen, LogOut option, ProfileScreen(Edit) )
+
+Added ( MultiMedia messaging, MessageInput Bar in ChatScreen, Push Notification)
