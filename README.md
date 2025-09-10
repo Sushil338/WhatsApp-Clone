@@ -10,3 +10,5 @@ Added status related files. (Status Data file, StatusListScreen, Status Reposito
 Added ( CallList Screen, Call Screen, Setting Screen, LogOut option, ProfileScreen(Edit) )
 
 Added ( MultiMedia messaging, MessageInput Bar in ChatScreen, Push Notification)
+
+Updated UI for better experience
