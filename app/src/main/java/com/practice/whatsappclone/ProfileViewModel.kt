@@ -21,7 +21,9 @@ class ProfileViewModel(
         userRepo.saveProfile(userId, name, about, bio, photoUri) { success, msg ->
             isLoading = false
             error = msg
-            if (success) onProfileSaved()
+            if (success) {
+                onProfileSaved()
+            }
         }
     }
 }

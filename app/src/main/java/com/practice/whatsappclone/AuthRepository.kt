@@ -6,6 +6,8 @@ import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import java.util.concurrent.TimeUnit
 
+
+
 class AuthRepository(private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()){
 
     fun isUserLoggedIn() : Boolean = firebaseAuth.currentUser != null

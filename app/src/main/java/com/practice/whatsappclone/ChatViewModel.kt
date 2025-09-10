@@ -1,5 +1,6 @@
 package com.practice.whatsappclone
 
+
 import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -12,9 +13,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 class ChatViewModel(private val chatId: String) : ViewModel() {
     val messages = mutableStateListOf<Message>()
     private val repo = ChatRepository()
+    private val firestore = FirebaseFirestore.getInstance()
 
     var newMessageText by mutableStateOf("")
-    private val firestore = FirebaseFirestore.getInstance()
+    var error by mutableStateOf<String?>(null)  // Error state exposed here
 
     init {
         repo.getMessages(chatId) { msgs ->
@@ -45,13 +47,11 @@ class ChatViewModel(private val chatId: String) : ViewModel() {
             timeStamp = timestamp
         )
 
-        // Write message to Firestore
         firestore.collection("chats").document(chatId)
             .collection("messages")
             .document(messageId)
             .set(msg)
             .addOnSuccessListener {
-                // Clear input field
                 newMessageText = ""
 
                 // Send push notification
@@ -68,9 +68,12 @@ class ChatViewModel(private val chatId: String) : ViewModel() {
                             )
                         }
                     }
+                    .addOnFailureListener { e ->
+                        error = "Notification send failed: ${e.message}"
+                    }
             }
             .addOnFailureListener { e ->
-                println("Failed to send message: ${e.message}")
+                error = "Failed to send message: ${e.message}"
             }
     }
 }

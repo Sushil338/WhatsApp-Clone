@@ -5,16 +5,19 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 
 @Composable
 fun MessageInputBar(
@@ -32,43 +35,51 @@ fun MessageInputBar(
         }
     }
 
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .imePadding()
+            .background(Color.White)
+    ) {
+        // ✅ Image Preview Box
         if (showImagePreview && pickedImageUri != null) {
             Box(
                 Modifier
                     .padding(8.dp)
                     .size(150.dp)
-                    .background(Color.LightGray, shape = MaterialTheme.shapes.medium)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.LightGray),
+                contentAlignment = Alignment.TopEnd
             ) {
-                androidx.compose.foundation.Image(
-                    painter = androidx.compose.ui.res.painterResource(android.R.drawable.ic_menu_report_image),
+                AsyncImage(
+                    model = pickedImageUri,
                     contentDescription = "Picked Image",
                     modifier = Modifier.fillMaxSize()
                 )
-                // Replace above painterResource with your image loader/painter such as Coil's rememberImagePainter(pickedImageUri)
-                // Example with Coil:
-                // Image(painter = rememberImagePainter(pickedImageUri), contentDescription = null, modifier = Modifier.fillMaxSize())
-                // Add an 'X' button to remove image
                 IconButton(
                     onClick = {
                         pickedImageUri = null
                         showImagePreview = false
-                    },
-                    modifier = Modifier.align(Alignment.TopEnd)
+                    }
                 ) {
-                    Icon(Icons.Filled.AttachFile, contentDescription = "Remove Image")
+                    Icon(Icons.Default.Close, contentDescription = "Remove Image", tint = Color.White)
                 }
             }
         }
 
+        // ✅ Input Row
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
+                .clip(RoundedCornerShape(24.dp))
+                .background(Color(0xFFF0F0F0))
+                .padding(horizontal = 8.dp, vertical = 4.dp)
         ) {
             IconButton(onClick = { imagePickerLauncher.launch("image/*") }) {
-                Icon(Icons.Filled.Photo, contentDescription = "Pick Image")
+                Icon(Icons.Filled.Photo, contentDescription = "Pick Image", tint = Color.Gray)
             }
 
             TextField(
@@ -77,17 +88,20 @@ fun MessageInputBar(
                 placeholder = { Text("Type a message") },
                 modifier = Modifier.weight(1f),
                 maxLines = 4,
-                enabled = !isSending
+                enabled = !isSending,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                )
             )
 
-            Spacer(modifier = Modifier.width(8.dp))
-
             val canSend = text.isNotBlank() || pickedImageUri != null
-
             IconButton(
                 onClick = {
                     if (pickedImageUri != null) {
-                        // When an image is picked, send it as image type with null content or empty content
                         onSendMessage("", pickedImageUri.toString(), "image")
                         pickedImageUri = null
                         showImagePreview = false
@@ -98,7 +112,11 @@ fun MessageInputBar(
                 },
                 enabled = canSend
             ) {
-                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
+                Icon(
+                    Icons.AutoMirrored.Filled.Send,
+                    contentDescription = "Send",
+                    tint = if (canSend) Color(0xFF075E54) else Color.Gray
+                )
             }
         }
     }

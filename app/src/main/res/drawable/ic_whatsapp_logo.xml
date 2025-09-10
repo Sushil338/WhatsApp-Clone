@@ -1,0 +1,19 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- WhatsApp Green Circle -->
+    <path
+        android:fillColor="#075E54"
+        android:pathData="M12,2C6.48,2 2,6.48 2,12c0,1.85 0.5,3.58 1.37,5.08L2,22l5.08,-1.37C8.42,21.5 10.15,22 12,22c5.52,0 10,-4.48 10,-10S17.52,2 12,2z"/>
+
+    <!-- Phone Shape (white) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M16.1,13.2l-1.2,-0.7c-0.3,-0.2 -0.7,-0.1 -0.9,0.2l-0.5,0.6c-0.2,0.3 -0.6,0.4 -0.9,0.2c-0.9,-0.5 -1.7,-1.2 -2.3,-2.1
+            c-0.2,-0.3 -0.1,-0.7 0.1,-0.9l0.5,-0.5c0.2,-0.2 0.3,-0.6 0.2,-0.9l-0.6,-1.3c-0.2,-0.4 -0.7,-0.6 -1.1,-0.5l-0.9,0.3
+            c-0.5,0.2 -0.8,0.6 -0.9,1.1c-0.1,0.9 0.1,1.9 0.6,2.7c1,1.7 2.5,3.1 4.2,4c0.8,0.4 1.7,0.6 2.6,0.6c0.5,0 1,-0.3 1.2,-0.8
+            l0.3,-0.8C16.6,13.9 16.5,13.4 16.1,13.2z"/>
+</vector>

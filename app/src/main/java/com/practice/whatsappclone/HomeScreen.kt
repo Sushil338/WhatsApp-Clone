@@ -1,8 +1,10 @@
 package com.practice.whatsappclone
 
+
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -19,17 +21,19 @@ fun HomeScreen(navController: NavController) {
     var selectedTab by remember { mutableIntStateOf(0) }
 
     Scaffold(
-        topBar = { WhatsAppAppBar(navController) },
+        topBar = { WhatsAppAppBar(navController = navController) },
         floatingActionButton = { /* Add FloatingActionButton here if needed */ }
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
             WhatsAppTabRow(selectedTab = selectedTab, onTabSelected = { selectedTab = it })
             when (selectedTab) {
-                0 -> ChatListScreen(onChatClicked = { chatId , receiverId ->
-                    navController.navigate("chat/$chatId/$receiverId")
-                })
-                1 -> StatusListScreen(navController)
-                2 -> CallsListScreen(navController)
+                0 -> ChatListScreen(navController = navController)
+                1 -> StatusListScreen(navController = navController)
+                2 -> CallsListScreen(navController = navController)
             }
         }
     }

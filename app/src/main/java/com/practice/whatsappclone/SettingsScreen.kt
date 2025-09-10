@@ -1,25 +1,29 @@
 package com.practice.whatsappclone
 
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(navController: NavController) {
+    val settingsViewModel: SettingsViewModel = viewModel()
+    var error by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(settingsViewModel.error.value) {
+        error = settingsViewModel.error.value
+        settingsViewModel.error.value = null
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -32,37 +36,46 @@ fun SettingsScreen(navController: NavController) {
             )
         }
     ) { padding ->
-        Column(modifier = Modifier.padding(padding).padding(16.dp)) {
-            Text(
-                "Edit Profile",
-                modifier = Modifier.fillMaxWidth().clickable {
-                    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-                    navController.navigate("profile/$userId")
-                }.padding(16.dp)
-            )
-            HorizontalDivider()
-            Text(
-                "Notifications",
-                modifier = Modifier.fillMaxWidth().clickable {
-                    navController.navigate("notifications")
-                }.padding(16.dp)
-            )
-            HorizontalDivider()
-            Text(
-                "Log Out",
-                modifier = Modifier.fillMaxWidth().clickable {
-                    // Firebase sign out
-                    FirebaseAuth.getInstance().signOut()
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.padding(padding).padding(16.dp)) {
+                Text(
+                    "Edit Profile",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+                            navController.navigate("profile/$userId")
+                        }
+                        .padding(16.dp)
+                )
+                HorizontalDivider()
+                Text(
+                    "Notifications",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            navController.navigate("notifications")
+                        }
+                        .padding(16.dp)
+                )
+                HorizontalDivider()
+                Text(
+                    "Log Out",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            settingsViewModel.performLogout {
+                                navController.navigate("login") {
+                                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                                }
+                            }
+                        }
+                        .padding(16.dp)
+                )
+                HorizontalDivider()
+            }
 
-                    // clear any app cached data or ViewModel states here if needed
-
-                    // Navigate to login clearing backstack
-                    navController.navigate("login") {
-                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                    }
-                }.padding(16.dp)
-            )
-            HorizontalDivider()
+            ErrorSnackbar(error = error) { error = null }
         }
     }
 }

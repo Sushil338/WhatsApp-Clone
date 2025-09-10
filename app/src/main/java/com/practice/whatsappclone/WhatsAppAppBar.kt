@@ -1,5 +1,6 @@
 package com.practice.whatsappclone
 
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.MoreVert
@@ -11,26 +12,36 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WhatsAppAppBar(navController: NavController){
-
+fun WhatsAppAppBar(navController: NavController) {
     var expanded by remember { mutableStateOf(false) }
 
-
     TopAppBar(
-        title = {Text("WhatsApp Clone")},
+        title = {
+            Text(
+                "WhatsApp Clone",
+                color = Color.White
+            )
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color(0xFF075E54), // WhatsApp green
+            titleContentColor = Color.White,
+            actionIconContentColor = Color.White
+        ),
         actions = {
-            IconButton(onClick = {}) { Icon(Icons.Default.Search, contentDescription = "Search") }
+            // ✅ Search button now navigates to "search" screen
+            IconButton(onClick = {
+                navController.navigate("search")
+            }) {
+                Icon(Icons.Default.Search, contentDescription = "Search")
+            }
 
             IconButton(onClick = { expanded = true }) {
                 Icon(Icons.Default.MoreVert, contentDescription = "More options")
@@ -58,18 +69,12 @@ fun WhatsAppAppBar(navController: NavController){
                     text = { Text("Logout") },
                     onClick = {
                         expanded = false
-                        // Firebase sign out
                         FirebaseAuth.getInstance().signOut()
-
-                        // clear any app cached data or ViewModel states here if needed
-
-                        // Navigate to login clearing backstack
                         navController.navigate("login") {
                             popUpTo(navController.graph.startDestinationId) { inclusive = true }
                         }
                     }
                 )
-                // Add more menu items if needed
             }
 
             IconButton(onClick = {
