@@ -1,6 +1,6 @@
 package com.practice.whatsappclone
 
-
+import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -13,13 +13,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
 import androidx.navigation.NavController
-
+import kotlinx.coroutines.launch
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,14 +33,17 @@ fun ChatScreen(
     receiverProfileUrl: String? = null
 ) {
     val chatViewModel: ChatViewModel = viewModel(factory = ChatViewModelFactory(chatId))
+    val callViewModel: CallViewModel = viewModel()
     val messages = chatViewModel.messages
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     var error by rememberSaveable { mutableStateOf<String?>(null) }
     var isLoading by rememberSaveable { mutableStateOf(true) }
 
     LaunchedEffect(messages) { isLoading = false }
+
     LaunchedEffect(chatViewModel.error) {
         error = chatViewModel.error
         chatViewModel.error = null
@@ -53,6 +58,7 @@ fun ChatScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .statusBarsPadding()
+                    .testTag("chatTopBar")
             ) {
                 Row(
                     modifier = Modifier
@@ -69,31 +75,73 @@ fun ChatScreen(
                                 modifier = Modifier
                                     .size(40.dp)
                                     .clip(CircleShape)
+                                    .testTag("chatProfileImage")
                             )
                         } else {
                             Icon(
                                 imageVector = Icons.Default.AccountCircle,
                                 contentDescription = "Receiver Profile",
                                 tint = Color.White,
-                                modifier = Modifier.size(40.dp)
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .testTag("chatDefaultProfile")
                             )
                         }
+
                         Spacer(modifier = Modifier.width(8.dp))
+
                         Text(
                             text = receiverName,
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.testTag("chatReceiverName")
                         )
                     }
+
                     Row {
-                        IconButton(onClick = { /* TODO: Navigate to video call */ }) {
+                        IconButton(
+                            modifier = Modifier.testTag("videoCallBtn"),
+                            onClick = {
+                                coroutineScope.launch {
+                                    val callId = UUID.randomUUID().toString()
+                                    callViewModel.initiateCall(receiverId, receiverName, callId)
+                                    context.startActivity(
+                                        Intent(context, CallActivity::class.java).apply {
+                                            putExtra("callId", callId)
+                                            putExtra("contactName", receiverName)
+                                            putExtra("callType", "video")
+                                            putExtra("launchedFromChat", true)
+                                        }
+                                    )
+                                }
+                            }
+                        ) {
                             Icon(Icons.Default.VideoCall, "Video Call", tint = Color.White)
                         }
-                        IconButton(onClick = { /* TODO: Navigate to audio call */ }) {
+                        IconButton(
+                            modifier = Modifier.testTag("audioCallBtn"),
+                            onClick = {
+                                coroutineScope.launch {
+                                    val callId = UUID.randomUUID().toString()
+                                    callViewModel.initiateCall(receiverId, receiverName, callId)
+                                    context.startActivity(
+                                        Intent(context, CallActivity::class.java).apply {
+                                            putExtra("callId", callId)
+                                            putExtra("contactName", receiverName)
+                                            putExtra("callType", "audio")
+                                            putExtra("launchedFromChat", true)
+                                        }
+                                    )
+                                }
+                            }
+                        ) {
                             Icon(Icons.Default.Call, "Audio Call", tint = Color.White)
                         }
-                        IconButton(onClick = { /* TODO: More options */ }) {
+                        IconButton(
+                            modifier = Modifier.testTag("moreOptionsBtn"),
+                            onClick = { /* TODO: Implement more options */ }
+                        ) {
                             Icon(Icons.Default.MoreVert, "More Options", tint = Color.White)
                         }
                     }
@@ -101,30 +149,42 @@ fun ChatScreen(
             }
         },
         bottomBar = {
-            MessageInputBar { content, mediaUrl, type ->
-                chatViewModel.sendMessage(
-                    receiverId = receiverId,
-                    content = content,
-                    mediaUrl = mediaUrl,
-                    type = type,
-                    context = context
-                )
-            }
+            MessageInputBar(
+                modifier = Modifier.testTag("messageInputBar"),
+                onSendMessage = { content, mediaUrl, type ->
+                    chatViewModel.sendMessage(
+                        receiverId = receiverId,
+                        content = content,
+                        mediaUrl = mediaUrl,
+                        type = type,
+                        context = context
+                    )
+                }
+            )
         }
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .testTag("chatScreenContainer")
         ) {
             when {
                 isLoading -> {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Box(
+                        Modifier.fillMaxSize()
+                            .testTag("loadingIndicator"),
+                        contentAlignment = Alignment.Center
+                    ) {
                         CircularProgressIndicator(color = Color(0xFF128C7E))
                     }
                 }
                 messages.isEmpty() -> {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Box(
+                        Modifier.fillMaxSize()
+                            .testTag("emptyChatMessage"),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Text(
                             "No messages yet. Start the conversation!",
                             style = MaterialTheme.typography.bodyLarge
@@ -134,12 +194,17 @@ fun ChatScreen(
                 else -> {
                     ChatMessages(
                         messages = messages,
-                        currentUserId = currentUserId
+                        currentUserId = currentUserId,
+                        modifier = Modifier.testTag("messageList")
                     )
                 }
-
             }
-            ErrorSnackbar(error = error) { error = null }
+
+            ErrorSnackbar(
+                error = error,
+                onDismiss = { error = null },
+                modifier = Modifier.testTag("errorSnackbar")
+            )
         }
     }
 }

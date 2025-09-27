@@ -1,6 +1,5 @@
 package com.practice.whatsappclone
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.IconButton
@@ -20,7 +19,8 @@ import coil.compose.rememberAsyncImagePainter
 fun StatusViewerScreen(
     navController: NavController,
     statusId: String,
-    repository: StatusRepository = StatusRepository()
+    repository: StatusRepository = StatusRepository(),
+    modifier: Modifier = Modifier
 ) {
     var status by remember { mutableStateOf<Status?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -38,7 +38,10 @@ fun StatusViewerScreen(
         }
     }
 
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
         when {
             loading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             status != null -> Image(
@@ -46,16 +49,25 @@ fun StatusViewerScreen(
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize()
             )
-            else -> Text("Status not found", modifier = Modifier.align(Alignment.Center))
+            else -> Text(
+                text = "Status not found",
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
 
         IconButton(
             onClick = { navController.popBackStack() },
-            modifier = Modifier.align(Alignment.TopEnd).padding(16.dp)
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp)
         ) {
             Icon(Icons.Default.Close, contentDescription = "Close")
         }
 
-        ErrorSnackbar(error = error) { error = null }
+        ErrorSnackbar(
+            error = error,
+            onDismiss = { error = null },
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }

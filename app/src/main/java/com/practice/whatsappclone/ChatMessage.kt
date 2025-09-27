@@ -21,7 +21,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun ChatMessages(
     messages: List<Message>,
-    currentUserId: String
+    currentUserId: String,
+    modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -44,7 +45,7 @@ fun ChatMessages(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             state = listState,

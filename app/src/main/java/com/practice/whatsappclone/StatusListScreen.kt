@@ -25,7 +25,8 @@ import java.util.concurrent.TimeUnit
 @Composable
 fun StatusListScreen(
     navController: NavController,
-    repository: StatusRepository = StatusRepository()
+    repository: StatusRepository = StatusRepository(),
+    modifier: Modifier = Modifier
 ) {
     var statuses by remember { mutableStateOf<List<Status>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
@@ -43,16 +44,21 @@ fun StatusListScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         when {
             loading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            statuses.isEmpty() -> Text(text = "No Status Found", modifier = Modifier.align(Alignment.Center))
+            statuses.isEmpty() -> Text(
+                text = "No Status Found",
+                modifier = Modifier.align(Alignment.Center)
+            )
             else -> {
-                LazyColumn {
+                LazyColumn(
+                    modifier = modifier.fillMaxSize()
+                ) {
                     items(statuses) { status ->
                         Row(
                             modifier = Modifier
-                                .fillMaxSize()
+                                .fillMaxWidth()
                                 .clickable { navController.navigate("status_viewer/${status.statusId}") }
                                 .padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically
@@ -85,7 +91,11 @@ fun StatusListScreen(
             Icon(Icons.Filled.Add, contentDescription = "Add Status")
         }
 
-        ErrorSnackbar(error = error) { error = null }
+        ErrorSnackbar(
+            error = error,
+            onDismiss = { error = null },
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 

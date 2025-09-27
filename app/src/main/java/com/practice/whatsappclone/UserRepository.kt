@@ -4,11 +4,12 @@ import android.net.Uri
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 
-class UserRepository(
+open class UserRepository(
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
     private val storage: FirebaseStorage = FirebaseStorage.getInstance()
 ) {
-    fun saveProfile(
+
+    open fun saveProfile(
         userId: String,
         name: String,
         about: String?,
@@ -24,7 +25,7 @@ class UserRepository(
                     ref.downloadUrl
                 }
                 .addOnSuccessListener { uri ->
-                    val profile = mutableMapOf(
+                    val profile = mutableMapOf<String, Any>(
                         "name" to name,
                         "photoUri" to uri.toString()
                     )

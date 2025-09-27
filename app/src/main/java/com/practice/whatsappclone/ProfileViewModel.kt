@@ -6,9 +6,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 
-class ProfileViewModel(
-    private val userRepo: UserRepository = UserRepository()
+open class ProfileViewModel(
+    val userRepo: UserRepository = UserRepository()
 ) : ViewModel() {
+
     var name by mutableStateOf("")
     var about by mutableStateOf("")
     var bio by mutableStateOf("")
@@ -16,7 +17,7 @@ class ProfileViewModel(
     var isLoading by mutableStateOf(false)
     var error by mutableStateOf<String?>(null)
 
-    fun saveUserProfile(userId: String, onProfileSaved: () -> Unit) {
+    open fun saveUserProfile(userId: String, onProfileSaved: () -> Unit) {
         isLoading = true
         userRepo.saveProfile(userId, name, about, bio, photoUri) { success, msg ->
             isLoading = false

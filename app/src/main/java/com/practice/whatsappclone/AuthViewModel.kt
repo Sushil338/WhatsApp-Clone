@@ -9,24 +9,27 @@ import com.google.firebase.FirebaseException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
 
-class AuthViewModel(
-    private val repository : AuthRepository = AuthRepository()
-) : ViewModel(){
-    var phoneNumber by mutableStateOf("")
-    var verificationId by mutableStateOf("")
-    var otp by mutableStateOf("")
-    var isLoading by mutableStateOf(false)
-    var errorMsg by mutableStateOf<String?>(null)
+open class AuthViewModel(
+    private val repository: AuthRepository = AuthRepository()
+) : ViewModel() {
 
-    fun checkLogin() = repository.isUserLoggedIn()
+    open var phoneNumber by mutableStateOf("")
+    open var verificationId by mutableStateOf("")
+    open var otp by mutableStateOf("")
+    open var isLoading by mutableStateOf(false)
+    open var errorMsg by mutableStateOf<String?>(null)
 
-    fun startPhoneAuth(activity: Activity, onCodeSent: () -> Unit) {
+    open fun checkLogin() = repository.isUserLoggedIn()
+
+    open fun startPhoneAuth(activity: Activity, onCodeSent: () -> Unit) {
         isLoading = true
         repository.sendVerificationCode(
-            phoneNumber, activity,
+            phoneNumber,
+            activity,
             object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+
                 override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-                    /*TODO("Not yet implemented")*/
+                    // You can implement auto-retrieval here if needed
                 }
 
                 override fun onVerificationFailed(e: FirebaseException) {
@@ -34,23 +37,27 @@ class AuthViewModel(
                     errorMsg = e.message
                 }
 
-                override fun onCodeSent(vid: String, token: PhoneAuthProvider.ForceResendingToken) {
+                override fun onCodeSent(
+                    vid: String,
+                    token: PhoneAuthProvider.ForceResendingToken
+                ) {
                     verificationId = vid
                     isLoading = false
                     onCodeSent()
                 }
-            })
+            }
+        )
     }
 
-    fun verifyOtp(onSuccess: () -> Unit) {
+    open fun verifyOtp(onSuccess: () -> Unit) {
         isLoading = true
-        repository.verifyCode(verificationId, otp){ success, message ->
+        repository.verifyCode(verificationId, otp) { success, message ->
             isLoading = false
-            if(success) onSuccess()
-            else errorMsg = message
-
+            if (success) {
+                onSuccess()
+            } else {
+                errorMsg = message
+            }
         }
     }
-
-
 }

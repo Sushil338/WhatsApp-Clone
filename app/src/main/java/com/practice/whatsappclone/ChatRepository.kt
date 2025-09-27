@@ -1,14 +1,13 @@
 package com.practice.whatsappclone
 
-
 import android.net.Uri
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 
-class ChatRepository (
-    private  val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
+class ChatRepository(
+    private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
     private val storage: FirebaseStorage = FirebaseStorage.getInstance()
-){
+) {
 
     fun generateMessageId(chatId: String): String {
         return db.collection("chats")
@@ -18,24 +17,26 @@ class ChatRepository (
             .id
     }
 
-    fun sendMessage(chatId: String, message: Message, onComplete: (Boolean, String?) -> Unit){
+    fun sendMessage(chatId: String, message: Message, onComplete: (Boolean, String?) -> Unit) {
         db.collection("chats")
             .document(chatId)
             .collection("messages")
             .document(message.messageId)
             .set(message)
-            .addOnSuccessListener { onComplete(true, null)}
+            .addOnSuccessListener { onComplete(true, null) }
             .addOnFailureListener { e -> onComplete(false, e.message) }
     }
-    fun getMessages(chatId: String, onResult: (List<Message>) -> Unit){
+
+    fun getMessages(chatId: String, onResult: (List<Message>) -> Unit) {
         db.collection("chats")
             .document(chatId)
             .collection("messages")
             .orderBy("timeStamp")
             .addSnapshotListener { snapshot, error ->
-                if(error != null || snapshot == null)
+                if (error != null || snapshot == null)
                     return@addSnapshotListener
-                val messages =snapshot.documents.mapNotNull{
+
+                val messages = snapshot.documents.mapNotNull {
                     it.toObject(Message::class.java)
                 }
                 onResult(messages)
@@ -60,5 +61,4 @@ class ChatRepository (
                 onComplete(null)
             }
     }
-
 }

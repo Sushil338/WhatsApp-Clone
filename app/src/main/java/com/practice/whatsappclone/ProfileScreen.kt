@@ -1,6 +1,5 @@
 package com.practice.whatsappclone
 
-
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -28,16 +27,17 @@ fun ProfileScreen(
     navController: NavController,
     viewModel: ProfileViewModel,
     userId: String,
-    onSaveNavigateTo: String = "home"
+    onSaveNavigateTo: String = "home",
+    modifier: Modifier = Modifier
 ) {
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
         viewModel.photoUri = it
     }
+
     val firebaseUser = FirebaseAuth.getInstance().currentUser
     val phoneNumber = firebaseUser?.phoneNumber ?: "Not Available"
 
     var error by remember { mutableStateOf<String?>(null) }
-
     LaunchedEffect(viewModel.error) {
         error = viewModel.error
         viewModel.error = null
@@ -59,21 +59,24 @@ fun ProfileScreen(
                 )
             )
         },
-        containerColor = Color(0xFFF0F2F5) // WhatsApp light background
+        containerColor = Color(0xFFF0F2F5),
+        modifier = modifier
     ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
                     .padding(horizontal = 24.dp, vertical = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(32.dp))
-
                 // Profile picture
                 Box(
-                    Modifier
+                    modifier = Modifier
                         .size(120.dp)
                         .clip(CircleShape)
                         .background(Color(0xFFBDBDBD)),
@@ -92,50 +95,50 @@ fun ProfileScreen(
                         tint = Color.White
                     )
                 }
-
                 TextButton(
                     onClick = { launcher.launch("image/*") },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = Color(0xFF128C7E)
-                    )
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF128C7E))
                 ) {
                     Text("Change Photo")
                 }
+                Spacer(modifier = Modifier.height(24.dp))
 
-                Spacer(Modifier.height(24.dp))
-
-                // Inputs styled like WhatsApp fields
+                // Profile inputs
                 ProfileTextField(
                     value = viewModel.name,
                     onValueChange = { viewModel.name = it },
-                    label = "Your Name"
+                    label = "Your Name",
+                    modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 ProfileTextField(
                     value = viewModel.about,
                     onValueChange = { viewModel.about = it },
-                    label = "About"
+                    label = "About",
+                    modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 ProfileTextField(
                     value = viewModel.bio,
                     onValueChange = { viewModel.bio = it },
-                    label = "Bio"
+                    label = "Bio",
+                    modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 ProfileTextField(
                     value = phoneNumber,
                     onValueChange = {},
                     label = "Phone Number",
-                    enabled = false
+                    enabled = false,
+                    modifier = Modifier.fillMaxWidth()
                 )
-
-                Spacer(Modifier.height(24.dp))
-
+                Spacer(modifier = Modifier.height(24.dp))
                 Button(
                     onClick = {
                         viewModel.saveUserProfile(userId) {
-                            navController.navigate(onSaveNavigateTo)
+                            navController.navigate(onSaveNavigateTo) {
+                                popUpTo("profile/$userId") { inclusive = true }
+                            }
                         }
                     },
                     enabled = viewModel.name.isNotBlank() && !viewModel.isLoading,
@@ -150,12 +153,18 @@ fun ProfileScreen(
                 }
 
                 if (viewModel.isLoading) {
-                    Spacer(Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     CircularProgressIndicator(color = Color(0xFF128C7E))
                 }
-            }
 
-            ErrorSnackbar(error = error) { error = null }
+                error?.let {
+                    ErrorSnackbar(
+                        error = it,
+                        onDismiss = { error = null },
+                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+                    )
+                }
+            }
         }
     }
 }
@@ -165,7 +174,8 @@ private fun ProfileTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier
 ) {
     OutlinedTextField(
         value = value,
@@ -173,7 +183,7 @@ private fun ProfileTextField(
         label = { Text(label) },
         enabled = enabled,
         singleLine = true,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Color(0xFF128C7E),

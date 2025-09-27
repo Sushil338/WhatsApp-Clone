@@ -7,7 +7,6 @@ import com.android.volley.toolbox.Volley
 import org.json.JSONObject
 
 object NotificationHelper {
-
     private const val VERSEL_URL = "https://vercelnotifications-ph8hp5jrg-sushils-projects-d3bdb4d0.vercel.app/send-notification"
 
     fun sendPushNotification(context: Context, receiverToken: String, title: String, body: String) {
@@ -30,4 +29,3 @@ object NotificationHelper {
         Volley.newRequestQueue(context).add(request)
     }
 }
-

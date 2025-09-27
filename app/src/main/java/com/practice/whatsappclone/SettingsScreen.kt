@@ -1,6 +1,5 @@
 package com.practice.whatsappclone
 
-
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -15,7 +14,10 @@ import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(navController: NavController) {
+fun SettingsScreen(
+    navController: NavController,
+    modifier: Modifier = Modifier
+) {
     val settingsViewModel: SettingsViewModel = viewModel()
     var error by remember { mutableStateOf<String?>(null) }
 
@@ -34,10 +36,16 @@ fun SettingsScreen(navController: NavController) {
                     }
                 }
             )
-        }
+        },
+        modifier = modifier
     ) { padding ->
-        Box(modifier = Modifier.fillMaxSize()) {
-            Column(modifier = Modifier.padding(padding).padding(16.dp)) {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
+            Column(modifier = modifier.padding(16.dp)) {
+
                 Text(
                     "Edit Profile",
                     modifier = Modifier
@@ -48,17 +56,17 @@ fun SettingsScreen(navController: NavController) {
                         }
                         .padding(16.dp)
                 )
-                HorizontalDivider()
+                Divider(modifier = Modifier.fillMaxWidth())
+
                 Text(
                     "Notifications",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable {
-                            navController.navigate("notifications")
-                        }
+                        .clickable { navController.navigate("notifications") }
                         .padding(16.dp)
                 )
-                HorizontalDivider()
+                Divider(modifier = Modifier.fillMaxWidth())
+
                 Text(
                     "Log Out",
                     modifier = Modifier
@@ -72,10 +80,16 @@ fun SettingsScreen(navController: NavController) {
                         }
                         .padding(16.dp)
                 )
-                HorizontalDivider()
+                Divider(modifier = Modifier.fillMaxWidth())
             }
 
-            ErrorSnackbar(error = error) { error = null }
+            error?.let {
+                ErrorSnackbar(
+                    error = it,
+                    onDismiss = { error = null },
+                    modifier = Modifier.fillMaxWidth().padding(8.dp)
+                )
+            }
         }
     }
 }

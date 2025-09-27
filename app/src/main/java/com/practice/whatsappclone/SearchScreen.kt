@@ -59,7 +59,6 @@ fun SearchScreen(navController: NavController) {
                             focusedPlaceholderColor = Color.White.copy(alpha = 0.7f),
                             unfocusedPlaceholderColor = Color.White.copy(alpha = 0.7f)
                         )
-
                     )
                 },
                 navigationIcon = {
@@ -72,7 +71,7 @@ fun SearchScreen(navController: NavController) {
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF075E54), // WhatsApp green
+                    containerColor = Color(0xFF075E54),
                     titleContentColor = Color.White
                 )
             )
@@ -108,16 +107,13 @@ fun SearchScreen(navController: NavController) {
                             .padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Simple placeholder for profile image
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = null,
                             tint = Color(0xFF075E54),
                             modifier = Modifier.size(28.dp)
                         )
-
                         Spacer(modifier = Modifier.width(12.dp))
-
                         Text(
                             text = chat,
                             fontSize = 18.sp,

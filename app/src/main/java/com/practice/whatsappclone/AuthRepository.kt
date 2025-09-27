@@ -6,27 +6,26 @@ import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import java.util.concurrent.TimeUnit
 
+class AuthRepository(private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()) {
 
-
-class AuthRepository(private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()){
-
-    fun isUserLoggedIn() : Boolean = firebaseAuth.currentUser != null
+    fun isUserLoggedIn(): Boolean = firebaseAuth.currentUser != null
 
     fun sendVerificationCode(
-        phoneNumber : String,
-        activity : Activity,
-        callbacks : PhoneAuthProvider.OnVerificationStateChangedCallbacks
-    ){
+        phoneNumber: String,
+        activity: Activity,
+        callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
+    ) {
         val options = PhoneAuthOptions.newBuilder(firebaseAuth)
             .setPhoneNumber(phoneNumber)
             .setTimeout(60L, TimeUnit.SECONDS)
             .setActivity(activity)
             .setCallbacks(callbacks)
             .build()
+
         PhoneAuthProvider.verifyPhoneNumber(options)
     }
 
-    fun verifyCode(verificationId: String, code: String, onComplete: (Boolean, String?) -> Unit){
+    fun verifyCode(verificationId: String, code: String, onComplete: (Boolean, String?) -> Unit) {
         val credential = PhoneAuthProvider.getCredential(verificationId, code)
         firebaseAuth.signInWithCredential(credential)
             .addOnCompleteListener { task ->

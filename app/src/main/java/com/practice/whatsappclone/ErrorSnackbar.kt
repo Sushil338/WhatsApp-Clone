@@ -9,11 +9,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ErrorSnackbar(error: String?, onDismiss: () -> Unit) {
-    if (!error.isNullOrEmpty()) {  // Null and empty check
+fun ErrorSnackbar(error: String?, onDismiss: () -> Unit, modifier: Modifier = Modifier) {
+    if (!error.isNullOrEmpty()) { // Null and empty check
         Snackbar(
             action = { Button(onClick = onDismiss) { Text("Dismiss") } },
-            modifier = Modifier.padding(8.dp)
+            modifier = modifier.padding(8.dp)
         ) {
             Text(error)
         }

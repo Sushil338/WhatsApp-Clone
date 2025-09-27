@@ -1,40 +1,32 @@
 package com.practice.whatsappclone
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.google.firebase.firestore.FirebaseFirestore
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun WhatsAppNavGraph(
-    navController: NavHostController,
-    authViewModel: AuthViewModel,
-    startDestination: String
-) {
+fun TestNavHost(navController: NavHostController, startDestination: String = "login") {
     NavHost(navController = navController, startDestination = startDestination) {
 
         composable("login") {
-            LoginScreen(navController, authViewModel)
+            val fakeAuthViewModel = remember { FakeAuthViewModel() }
+            LoginScreen(navController = navController, viewModel = fakeAuthViewModel)
         }
 
         composable("home") {
             HomeScreen(navController)
         }
 
-        composable(
-            "profile/{userId}",
-            arguments = listOf(navArgument("userId") { type = NavType.StringType })
-        ) { backStackEntry ->
+        composable("profile/{userId}", arguments = listOf(
+            navArgument("userId") { type = NavType.StringType }
+        )) { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            val profileViewModel: ProfileViewModel = viewModel()
-            ProfileScreen(navController, profileViewModel, userId)
+            val fakeProfileViewModel = remember { FakeProfileViewModel() }
+            ProfileScreen(navController, fakeProfileViewModel, userId)
         }
 
         composable(
@@ -82,21 +74,12 @@ fun WhatsAppNavGraph(
             val callId = backStackEntry.arguments?.getString("callId") ?: ""
             val callerName = backStackEntry.arguments?.getString("callerName") ?: ""
             val callType = backStackEntry.arguments?.getString("callType") ?: "video"
-
             IncomingCallScreen(
                 callId = callId,
                 callerName = callerName,
                 callType = callType,
-                onAccept = {
-                    navController.navigate("call/$callerName") {
-                        popUpTo("incoming_call/$callId/$callerName/$callType") { inclusive = true }
-                    }
-                },
-                onDecline = {
-                    val callDoc = FirebaseFirestore.getInstance().collection("calls").document(callId)
-                    callDoc.update("status", "missed")
-                    navController.popBackStack()
-                }
+                onAccept = { /* No-op for tests */ },
+                onDecline = { navController.popBackStack() }
             )
         }
     }

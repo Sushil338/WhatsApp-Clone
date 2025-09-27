@@ -1,6 +1,6 @@
 package com.practice.whatsappclone
 
-
+import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,98 +13,129 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
 
 @Composable
 fun CallsListScreen(
     navController: NavController,
-    callViewModel: CallViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    callViewModel: CallViewModel = viewModel()
 ) {
-    val callLogs: List<Call> = callViewModel.calls.toList()
+    val calls = callViewModel.calls
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     var isLoading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
 
-    // Simulate loading complete
-    LaunchedEffect(callLogs) {
-        isLoading = false
-    }
+    LaunchedEffect(calls) { isLoading = false }
 
-    // Handle error
     LaunchedEffect(callViewModel.error.value) {
         error = callViewModel.error.value
         callViewModel.error.value = null
     }
 
-    // Main content
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .testTag("callsListContainer")
+    ) {
         when {
             isLoading -> {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = Color(0xFF128C7E))
+                    CircularProgressIndicator(
+                        color = Color(0xFF128C7E),
+                        modifier = Modifier.testTag("callsLoadingIndicator")
+                    )
                 }
             }
-
-            callLogs.isEmpty() -> {
+            calls.isEmpty() -> {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         "No call history available",
                         style = MaterialTheme.typography.bodyLarge,
-                        color = Color.Gray
+                        color = Color.Gray,
+                        modifier = Modifier.testTag("emptyCallsText")
                     )
                 }
             }
-
             else -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 0.dp) // align right under tabs
-                ) {
-                    items(callLogs) { call ->
+                LazyColumn(modifier = Modifier.testTag("callsList")) {
+                    items(calls) { call ->
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 12.dp, vertical = 6.dp)
+                                .padding(12.dp, 6.dp)
                                 .clickable {
-                                    navController.navigate("call/${call.contactName}")
-                                },
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color(0xFFE0F7FA)
-                            ),
+                                    coroutineScope.launch {
+                                        callViewModel.initiateCall(call.calleeUid, call.contactName, call.callId)
+                                        val intent = Intent(context, CallActivity::class.java).apply {
+                                            putExtra("callId", call.callId)
+                                            putExtra("contactName", call.contactName)
+                                            putExtra("callType", call.type)
+                                            putExtra("launchedFromChat", false)
+                                        }
+                                        context.startActivity(intent)
+                                    }
+                                }
+                                .testTag("callItem_${call.callId}"),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFE0F7FA)),
                             shape = RoundedCornerShape(12.dp)
                         ) {
                             Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
+                                modifier = Modifier.padding(16.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
                                     Icons.Default.Call,
-                                    contentDescription = "Call",
-                                    modifier = Modifier.size(40.dp),
+                                    contentDescription = "Call Icon",
+                                    modifier = Modifier.size(40.dp).testTag("callIcon_${call.callId}"),
                                     tint = Color(0xFF128C7E)
                                 )
-                                Spacer(modifier = Modifier.width(12.dp))
+                                Spacer(Modifier.width(12.dp))
                                 Column {
                                     Text(
-                                        text = call.contactName,
+                                        call.contactName,
                                         style = MaterialTheme.typography.titleMedium,
-                                        color = Color.Black
+                                        color = Color.Black,
+                                        modifier = Modifier.testTag("callName_${call.callId}")
                                     )
-                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Spacer(Modifier.height(2.dp))
                                     Text(
-                                        text = "${call.type} • ${call.time}",
+                                        text = call.type.replaceFirstChar { it.uppercase() } + " • " + formatTimestamp(call.time),
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = Color.DarkGray
+                                        color = Color.DarkGray,
+                                        modifier = Modifier.testTag("callTypeTime_${call.callId}")
                                     )
+                                    Text(
+                                        text = call.status.replaceFirstChar { it.uppercase() },
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = when (call.status.lowercase()) {
+                                            "missed" -> Color.Red
+                                            "accepted" -> Color.Green
+                                            "ringing" -> Color(0xFFFFA500)
+                                            "ended" -> Color.Gray
+                                            else -> Color.DarkGray
+                                        },
+                                        modifier = Modifier.testTag("callStatus_${call.callId}")
+                                    )
+                                    if (call.duration > 0) {
+                                        Text(
+                                            text = "Duration: ${formatDuration(call.duration)}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = Color.DarkGray,
+                                            modifier = Modifier.testTag("callDuration_${call.callId}")
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -113,7 +144,31 @@ fun CallsListScreen(
             }
         }
 
-        // Show error if exists
-        ErrorSnackbar(error = error) { error = null }
+        error?.let {
+            Snackbar(
+                action = {
+                    TextButton(onClick = { error = null }) {
+                        Text("Dismiss")
+                    }
+                },
+                modifier = Modifier.testTag("callsErrorSnackbar")
+            ) {
+                Text(text = it)
+            }
+        }
     }
+}
+
+fun formatTimestamp(time: Long): String {
+    return android.text.format.DateFormat.format("dd MMM yyyy, hh:mm a", java.util.Date(time)).toString()
+}
+
+fun formatDuration(duration: Long): String {
+    val seconds = (duration / 1000) % 60
+    val minutes = (duration / (1000 * 60)) % 60
+    val hours = (duration / (1000 * 60 * 60))
+    return if (hours > 0)
+        String.format("%d:%02d:%02d", hours, minutes, seconds)
+    else
+        String.format("%02d:%02d", minutes, seconds)
 }

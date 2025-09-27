@@ -49,14 +49,33 @@ android {
 }
 
 dependencies {
+
+    androidTestImplementation("androidx.navigation:navigation-testing:2.7.7")
+
+    implementation("androidx.compose.ui:ui:1.5.0")
+// or latest stable
+    implementation("androidx.compose.ui:ui-tooling:1.5.0")
+// for preview and testing
+    implementation("androidx.compose.ui:ui-tooling-preview:1.5.0")
+
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+
+
+    implementation("com.infobip:google-webrtc:1.0.45036")
+
+    // Firebase with BOM
+    implementation(platform("com.google.firebase:firebase-bom:32.2.0"))
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-database-ktx")
+    implementation("com.google.firebase:firebase-messaging-ktx")
+    implementation("com.google.firebase:firebase-storage-ktx")
+
+    // Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
     // Networking
     implementation("com.android.volley:volley:1.2.1")
-
-    // Firebase
-    implementation("com.google.firebase:firebase-messaging-ktx:23.4.1")
-    implementation("com.google.firebase:firebase-auth-ktx:22.1.1")
-    implementation("com.google.firebase:firebase-firestore-ktx:24.10.2")
-    implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
 
     // Image loading
     implementation("com.github.bumptech.glide:glide:4.16.0")
@@ -74,7 +93,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.5.0")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-    implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.runtime)
 
     // Desugaring
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")

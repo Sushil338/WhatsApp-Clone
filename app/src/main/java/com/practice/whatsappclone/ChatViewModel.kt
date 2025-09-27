@@ -1,6 +1,5 @@
 package com.practice.whatsappclone
 
-
 import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -11,12 +10,13 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class ChatViewModel(private val chatId: String) : ViewModel() {
+
     val messages = mutableStateListOf<Message>()
     private val repo = ChatRepository()
     private val firestore = FirebaseFirestore.getInstance()
 
     var newMessageText by mutableStateOf("")
-    var error by mutableStateOf<String?>(null)  // Error state exposed here
+    var error by mutableStateOf<String?>(null) // Error state exposed here
 
     init {
         repo.getMessages(chatId) { msgs ->
@@ -35,7 +35,6 @@ class ChatViewModel(private val chatId: String) : ViewModel() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
         val timestamp = System.currentTimeMillis()
         val messageId = repo.generateMessageId(chatId)
-
         val msg = Message(
             messageId = messageId,
             chatId = chatId,
@@ -46,20 +45,18 @@ class ChatViewModel(private val chatId: String) : ViewModel() {
             type = type,
             timeStamp = timestamp
         )
-
         firestore.collection("chats").document(chatId)
             .collection("messages")
             .document(messageId)
             .set(msg)
             .addOnSuccessListener {
                 newMessageText = ""
-
                 // Send push notification
                 firestore.collection("users").document(receiverId).get()
                     .addOnSuccessListener { doc ->
-                        val receiverTokens = doc.get("fcmTokens") as? List<String> ?: return@addOnSuccessListener
+                        val receiverTokens = doc.get("fcmTokens") as? List<*> ?: return@addOnSuccessListener
                         if (receiverTokens.isNotEmpty()) {
-                            val token = receiverTokens[0]
+                            val token = receiverTokens[0] as? String ?: return@addOnSuccessListener
                             NotificationHelper.sendPushNotification(
                                 context = context,
                                 receiverToken = token,

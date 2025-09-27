@@ -13,6 +13,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.navigation.NavController
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -21,15 +22,19 @@ fun HomeScreen(navController: NavController) {
     var selectedTab by remember { mutableIntStateOf(0) }
 
     Scaffold(
-        topBar = { WhatsAppAppBar(navController = navController) },
-        floatingActionButton = { /* Add FloatingActionButton here if needed */ }
+        topBar = { WhatsAppAppBar(navController = navController)},
+        floatingActionButton = { }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            WhatsAppTabRow(selectedTab = selectedTab, onTabSelected = { selectedTab = it })
+            WhatsAppTabRow(
+                selectedTab = selectedTab,
+                onTabSelected = { selectedTab = it },
+                modifier = Modifier.testTag("tabRow")
+            )
             when (selectedTab) {
                 0 -> ChatListScreen(navController = navController)
                 1 -> StatusListScreen(navController = navController)
@@ -38,3 +43,4 @@ fun HomeScreen(navController: NavController) {
         }
     }
 }
+
